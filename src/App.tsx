@@ -91,18 +91,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <section className="bg-white border-y border-slate-200 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">Vi samarbetar med certifierade experter</p>
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale">
-            <div className="flex items-center gap-2 font-bold text-lg"><Award className="w-6 h-6" /> SKVP Certifierad</div>
-            <div className="flex items-center gap-2 font-bold text-lg"><ShieldCheck className="w-6 h-6" /> Trygg E-handel</div>
-            <div className="flex items-center gap-2 font-bold text-lg"><CheckCircle2 className="w-6 h-6" /> Godkänd för F-skatt</div>
-            <div className="flex items-center gap-2 font-bold text-lg"><Zap className="w-6 h-6" /> ROT & Grön Teknik</div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Main Content: Funnel & Features */}
       <section className="py-16 lg:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-start">
