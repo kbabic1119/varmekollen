@@ -18,6 +18,7 @@ import {
 
 export default function App() {
   const funnelRef = useRef<HTMLDivElement>(null);
+  const [selectedHeating, setSelectedHeating] = useState('');
 
   const scrollToFunnel = () => {
     funnelRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,15 +99,7 @@ export default function App() {
 
         {/* Left Column: Funnel */}
         <div ref={funnelRef} className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-2 bg-slate-100">
-            <motion.div
-              className="h-full bg-blue-600"
-              initial={{ width: '25%' }}
-              animate={{ width: `${(1 / 4) * 100}%` }} // Will be overridden by state in Funnel component
-              style={{ width: '25%' }} // Fallback
-            />
-          </div>
-          <Funnel />
+          <Funnel selectedHeating={selectedHeating} setSelectedHeating={setSelectedHeating} />
         </div>
 
         {/* Right Column: Features & Calculator */}
@@ -137,7 +130,7 @@ export default function App() {
               <CalcIcon className="w-6 h-6 text-blue-400" /> Besparingskalkylator
             </h3>
             <p className="text-slate-300 mb-6 text-sm">Se din potentiella besparing per år.</p>
-            <Calculator />
+            <Calculator heatingType={selectedHeating} />
           </div>
         </div>
       </section>
@@ -175,8 +168,10 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
   );
 }
 
-function Funnel() {
+function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: string, setSelectedHeating: (heating: string) => void }) {
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState({
     heating: '',
     area: 120,
@@ -189,18 +184,54 @@ function Funnel() {
 
   const updateForm = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
+    if (key === 'heating') {
+      setSelectedHeating(value);
+    }
   };
 
   const nextStep = () => setStep(s => Math.min(s + 1, 5));
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
-  const submitForm = (e: React.FormEvent) => {
+  // Swedish zip code validation (XXX XX format)
+  const isValidZip = (zip: string) => /^\d{3}\s?\d{2}$/.test(zip.replace(/\s/g, ''));
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidPhone = (phone: string) => /^[\d\+\-\s]{7,}$/.test(phone);
+
+  const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.gdpr) return;
-    // Simulate API call
-    setTimeout(() => {
+    setSubmitError('');
+    
+    if (!formData.gdpr) {
+      setSubmitError('Du måste godkänna integritetspolicyn för att fortsätta.');
+      return;
+    }
+
+    if (!isValidZip(formData.zip)) {
+      setSubmitError('Ange ett giltigt postnummer (t.ex. 123 45).');
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setSubmitError('Ange en giltig e-postadress.');
+      return;
+    }
+
+    if (!isValidPhone(formData.phone)) {
+      setSubmitError('Ange ett giltigt telefonnummer.');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setStep(5); // Success step
-    }, 800);
+    } catch (error) {
+      setSubmitError('Något gick fel. Vänligen försök igen.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -304,15 +335,33 @@ function Funnel() {
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="T.ex. 123 45"
+                    placeholder="123 45"
                     value={formData.zip}
-                    onChange={(e) => updateForm('zip', e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:ring-0 outline-none text-lg transition-colors"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Auto-format Swedish zip code
+                      const digits = value.replace(/\D/g, '').slice(0, 5);
+                      const formatted = digits.length > 3 ? `${digits.slice(0, 3)} ${digits.slice(3)}` : digits;
+                      updateForm('zip', formatted);
+                    }}
+                    className={`w-full pl-12 pr-4 py-4 rounded-xl border-2 focus:border-blue-600 focus:ring-0 outline-none text-lg transition-colors ${
+                      formData.zip && !isValidZip(formData.zip) 
+                        ? 'border-red-300 bg-red-50' 
+                        : 'border-slate-200'
+                    }`}
+                    aria-label="Postnummer"
+                    aria-invalid={formData.zip && !isValidZip(formData.zip)}
                   />
                 </div>
+                {formData.zip && !isValidZip(formData.zip) && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
+                    Ogiltigt postnummer. Format: 123 45
+                  </p>
+                )}
                 <button
                   onClick={nextStep}
-                  disabled={formData.zip.length < 5}
+                  disabled={!isValidZip(formData.zip)}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2"
                 >
                   Nästa <ArrowRight className="w-5 h-5" />
@@ -332,6 +381,12 @@ function Funnel() {
                 <h3 className="text-2xl font-bold text-slate-900">Sista steget!</h3>
                 <p className="text-slate-600">Vem ska vi skicka offerterna till?</p>
 
+                {submitError && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm" role="alert">
+                    {submitError}
+                  </div>
+                )}
+
                 <div className="space-y-3">
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -339,6 +394,7 @@ function Funnel() {
                       type="text" required placeholder="För- och efternamn"
                       value={formData.name} onChange={(e) => updateForm('name', e.target.value)}
                       className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 outline-none transition-colors"
+                      aria-label="Namn"
                     />
                   </div>
                   <div className="relative">
@@ -346,17 +402,31 @@ function Funnel() {
                     <input
                       type="email" required placeholder="E-postadress"
                       value={formData.email} onChange={(e) => updateForm('email', e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 outline-none transition-colors"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${
+                        formData.email && !isValidEmail(formData.email) ? 'border-red-300 bg-red-50' : 'border-slate-200'
+                      }`}
+                      aria-label="E-post"
+                      aria-invalid={formData.email && !isValidEmail(formData.email)}
                     />
                   </div>
+                  {formData.email && !isValidEmail(formData.email) && (
+                    <p className="text-sm text-red-600 -mt-2">Ange en giltig e-postadress.</p>
+                  )}
                   <div className="relative">
                     <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
                     <input
                       type="tel" required placeholder="Telefonnummer"
                       value={formData.phone} onChange={(e) => updateForm('phone', e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 outline-none transition-colors"
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${
+                        formData.phone && !isValidPhone(formData.phone) ? 'border-red-300 bg-red-50' : 'border-slate-200'
+                      }`}
+                      aria-label="Telefon"
+                      aria-invalid={formData.phone && !isValidPhone(formData.phone)}
                     />
                   </div>
+                  {formData.phone && !isValidPhone(formData.phone) && (
+                    <p className="text-sm text-red-600 -mt-2">Ange ett giltigt telefonnummer.</p>
+                  )}
                 </div>
 
                 <label className="flex items-start gap-3 cursor-pointer mt-4">
@@ -372,10 +442,20 @@ function Funnel() {
 
                 <button
                   type="submit"
-                  disabled={!formData.gdpr}
+                  disabled={!formData.gdpr || isLoading}
                   className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2 text-lg shadow-lg"
                 >
-                  Få mina offerter nu
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Skickar...
+                    </>
+                  ) : (
+                    'Få mina offerter nu'
+                  )}
                 </button>
               </motion.form>
             )}
@@ -403,9 +483,16 @@ function Funnel() {
   );
 }
 
-function Calculator() {
-  const [heatingType, setHeatingType] = useState('Direktverkande El');
+function Calculator({ heatingType: propHeatingType }: { heatingType?: string }) {
+  const [heatingType, setHeatingType] = useState(propHeatingType || 'Direktverkande El');
   const [cost, setCost] = useState(30000);
+
+  // Sync with funnel selection when provided
+  React.useEffect(() => {
+    if (propHeatingType) {
+      setHeatingType(propHeatingType);
+    }
+  }, [propHeatingType]);
 
   const savingsMap: Record<string, number> = {
     'Direktverkande El': 0.65,
