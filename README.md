@@ -27,40 +27,6 @@ Sidan innehåller en interaktiv, flerstegs offertförfrågan (funnel) samt en in
 - **Animationer**: [Motion (Framer Motion)](https://motion.dev/)
 - **Databas/Backend (Kommande)**: Better SQLite3 & Express
 
-## 🚀 Kom igång lokalt
-
-Följ dessa steg för att köra projektet på din egen dator:
-
-### 1. Klona repositoryt (om tillämpligt)
-\`\`\`bash
-git clone <url-till-repo>
-cd varmekollen
-\`\`\`
-
-### 2. Installera beroenden
-Se till att du har **Node.js** (v18+) installerat.
-\`\`\`bash
-npm install
-\`\`\`
-
-### 3. Konfigurera miljövariabler
-Kopiera \`.env.example\` till \`.env.local\` och lägg till dina nycklar (om nödvändigt):
-\`\`\`bash
-cp .env.example .env.local
-\`\`\`
-
-### 4. Starta utvecklingsservern
-\`\`\`bash
-npm run dev
-\`\`\`
-Din app rullar nu på \`http://localhost:3000/varmekollen/\`!
-
-## 🧪 Skript
-
-- \`npm run dev\`: Startar Vite dev-servern
-- \`npm run build\`: Bygger applikationen för produktion i \`dist\`-mappen
-- \`npm run preview\`: Förhandsgranskar den byggda produktionsversionen lokalt
-- \`npm run lint\`: Kör TypeScript kompilatorns typkontroll (\`tsc --noEmit\`)
 
 ## 📄 Licens & Rättigheter
 
