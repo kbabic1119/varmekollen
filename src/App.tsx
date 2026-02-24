@@ -29,13 +29,13 @@ export default function App() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Leaf className="w-6 h-6 text-blue-600" />
-            <span className="font-bold text-xl tracking-tight text-slate-900">Värme<span className="text-blue-600">Kollen</span></span>
-          </div>
           <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-slate-600">
             <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Gratis & Obindande</span>
             <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Svar inom 24h</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Leaf className="w-12 h-12 text-blue-600" />
+            <span className="font-black text-3xl md:text-4xl tracking-tighter text-slate-900 uppercase">Värme<span className="text-blue-600">Kollen</span></span>
           </div>
         </div>
       </header>
@@ -200,7 +200,7 @@ function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: stri
   const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError('');
-    
+
     if (!formData.gdpr) {
       setSubmitError('Du måste godkänna integritetspolicyn för att fortsätta.');
       return;
@@ -222,7 +222,7 @@ function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: stri
     }
 
     setIsLoading(true);
-    
+
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -344,11 +344,10 @@ function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: stri
                       const formatted = digits.length > 3 ? `${digits.slice(0, 3)} ${digits.slice(3)}` : digits;
                       updateForm('zip', formatted);
                     }}
-                    className={`w-full pl-12 pr-4 py-4 rounded-xl border-2 focus:border-blue-600 focus:ring-0 outline-none text-lg transition-colors ${
-                      formData.zip && !isValidZip(formData.zip) 
-                        ? 'border-red-300 bg-red-50' 
-                        : 'border-slate-200'
-                    }`}
+                    className={`w-full pl-12 pr-4 py-4 rounded-xl border-2 focus:border-blue-600 focus:ring-0 outline-none text-lg transition-colors ${formData.zip && !isValidZip(formData.zip)
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-slate-200'
+                      }`}
                     aria-label="Postnummer"
                     aria-invalid={formData.zip && !isValidZip(formData.zip)}
                   />
@@ -402,9 +401,8 @@ function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: stri
                     <input
                       type="email" required placeholder="E-postadress"
                       value={formData.email} onChange={(e) => updateForm('email', e.target.value)}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${
-                        formData.email && !isValidEmail(formData.email) ? 'border-red-300 bg-red-50' : 'border-slate-200'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${formData.email && !isValidEmail(formData.email) ? 'border-red-300 bg-red-50' : 'border-slate-200'
+                        }`}
                       aria-label="E-post"
                       aria-invalid={formData.email && !isValidEmail(formData.email)}
                     />
@@ -417,9 +415,8 @@ function Funnel({ selectedHeating, setSelectedHeating }: { selectedHeating: stri
                     <input
                       type="tel" required placeholder="Telefonnummer"
                       value={formData.phone} onChange={(e) => updateForm('phone', e.target.value)}
-                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${
-                        formData.phone && !isValidPhone(formData.phone) ? 'border-red-300 bg-red-50' : 'border-slate-200'
-                      }`}
+                      className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 focus:border-blue-600 outline-none transition-colors ${formData.phone && !isValidPhone(formData.phone) ? 'border-red-300 bg-red-50' : 'border-slate-200'
+                        }`}
                       aria-label="Telefon"
                       aria-invalid={formData.phone && !isValidPhone(formData.phone)}
                     />
