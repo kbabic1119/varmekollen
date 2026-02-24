@@ -29,13 +29,13 @@ export default function App() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Gratis & Obindande</span>
-            <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Svar inom 24h</span>
-          </div>
           <div className="flex items-center gap-4">
             <Leaf className="w-12 h-12 text-blue-600" />
             <span className="font-black text-3xl md:text-4xl tracking-tighter text-slate-900 uppercase">Värme<span className="text-blue-600">Kollen</span></span>
+          </div>
+          <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-slate-600">
+            <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Gratis & Obindande</span>
+            <span className="flex items-center gap-1"><Check className="w-4 h-4 text-green-500" /> Svar inom 24h</span>
           </div>
         </div>
       </header>
